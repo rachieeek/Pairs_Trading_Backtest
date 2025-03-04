@@ -1,7 +1,8 @@
-from typing import Tuple
+from typing import Tuple, List
 from dataclasses import dataclass
 import numpy as np
 import pandas as pd
+
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
@@ -120,3 +121,18 @@ class PairStatistics:
         coint_data = CointData(cointegrated=cointegrated, confidence=interval, weight=hedge_val, asset_a=sym_a,
                                asset_b=sym_b)
         return coint_data
+    
+    def add_spread_stats(self, coint_data_list: List[CointData], close_prices: pd.DataFrame) -> None:
+        """
+        Add the spread standard deviation to the CointData object
+        :param coint_data_list:
+        :return:
+        """
+        for coint_pair in coint_data_list:
+            stock_a = coint_pair.asset_a
+            stock_b = coint_pair.asset_b
+            close_a = close_prices[stock_a]
+            close_b = close_prices[stock_b]
+            weight = coint_pair.weight
+            spread = close_a - coint_pair.intercept - weight * close_b
+            coint_pair.stddev = np.std(spread)

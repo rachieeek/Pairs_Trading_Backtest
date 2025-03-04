@@ -1,2 +1,9 @@
 requirements.txt
 .venv
+
+*.pyc
+*.csv
+*.png
+data/*
+__pycache__/*
+.DS_Store
